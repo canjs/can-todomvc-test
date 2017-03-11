@@ -1,0 +1,21 @@
+{
+  "name": "can-todomvc-test",
+  "version": "0.0.1",
+  "description": "Tests and assets for the todomvc-steal guide",
+  "main": "can-todomvc-test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "can-util": "^3.3.2",
+    "steal-css": "^1.2.1",
+    "steal-qunit": "^1.0.1"
+  },
+  "steal": {
+    "plugins": [
+      "steal-css"
+    ]
+  }
+}
