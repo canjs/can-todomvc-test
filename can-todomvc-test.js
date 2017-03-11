@@ -187,44 +187,46 @@ module.exports = function(appVM){
     QUnit.asyncTest("Simulate the `/api/todos` service",function(){
 
         steal.import("todomvc/models/todos-fixture").then(function(){
+            return fixture.then(function(fixture){
+                fixture.delay = 10;
 
-            ajax({
-                url: "/api/todos",
-                type: "GET"
-            }).then(function(response){
-                QUnit.ok(response, "GET /api/todos response");
-                QUnit.ok(Array.isArray(response.data), "data is array");
-                QUnit.ok(response.data.length, "data has at least one item");
-                var firstTodo = response.data[0];
-                QUnit.ok(firstTodo.id && firstTodo.name && firstTodo.complete !== undefined, "has id, name, and complete");
-
-            }).then(function(){
                 return ajax({
                     url: "/api/todos",
-                    type: "POST",
-                    data: {name: "make a fixture", complete: true}
-                }).then(function(data){
-                    var id = data.id;
-                    QUnit.ok(id, "POST has an id value sent back");
-                    return ajax({
-                        url: "/api/todos/"+id,
-                        type: "PUT",
-                        data: {name: "make a fixture", complete: false}
-                    }).then(function(data){
-                        QUnit.deepEqual(data, {name: "make a fixture", complete: false, id: ""+id}, "updated data");
+                    type: "GET"
+                }).then(function(response){
+                    QUnit.ok(response, "GET /api/todos response");
+                    QUnit.ok(Array.isArray(response.data), "data is array");
+                    QUnit.ok(response.data.length, "data has at least one item");
+                    var firstTodo = response.data[0];
+                    QUnit.ok(firstTodo.id && firstTodo.name && firstTodo.complete !== undefined, "has id, name, and complete");
 
+                }).then(function(){
+                    return ajax({
+                        url: "/api/todos",
+                        type: "POST",
+                        data: {name: "make a fixture", complete: true}
+                    }).then(function(data){
+                        var id = data.id;
+                        QUnit.ok(id, "POST has an id value sent back");
                         return ajax({
                             url: "/api/todos/"+id,
-                            type: "DELETE"
-                        }).then(function(){
-                            QUnit.ok(true, "delete is successful");
+                            type: "PUT",
+                            data: {name: "make a fixture", complete: false}
+                        }).then(function(data){
+                            QUnit.deepEqual(data, {name: "make a fixture", complete: false, id: ""+id}, "updated data");
+
+                            return ajax({
+                                url: "/api/todos/"+id,
+                                type: "DELETE"
+                            }).then(function(){
+                                QUnit.ok(true, "delete is successful");
+                            });
+
                         });
-
                     });
-                });
+                })
+
             })
-
-
             .then(function(){
                 QUnit.start();
             },function(e){
