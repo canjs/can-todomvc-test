@@ -224,7 +224,7 @@ module.exports = function(appVM){
 
                         });
                     });
-                })
+                });
 
             })
             .then(function(){
