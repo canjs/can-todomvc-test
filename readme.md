@@ -1,5 +1,7 @@
 # can-todomvc-test
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/canjs/can-todomvc-test.svg)](https://greenkeeper.io/)
+
 This project is used to test a CanJS implementation of TodoMVC.  
 To use it:
 
