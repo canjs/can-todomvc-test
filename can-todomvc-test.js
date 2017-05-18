@@ -24,7 +24,7 @@ module.exports = function(appVM){
 
     var timeToShowTodos,
         fixture = steal.import("can-fixture"),
-        todoModelPromise = steal.import("todomvc/models/todo");
+        todoModelPromise = steal.import("todomvc/models/todo").then(moduleDefault);
 
     // makes sure we wait for the app to load
     // and sets the fixture delay to 10 on the first test.
@@ -186,7 +186,7 @@ module.exports = function(appVM){
 
     QUnit.asyncTest("Simulate the `/api/todos` service",function(){
 
-        steal.import("todomvc/models/todos-fixture").then(function(){
+        steal.import("todomvc/models/todos-fixture").then(moduleDefault).then(function(){
             return fixture.then(function(fixture){
                 fixture.delay = 10;
 
@@ -361,7 +361,7 @@ module.exports = function(appVM){
     });
 
     QUnit.asyncTest("Create todos",function(){
-        steal.import("todomvc/components/todo-create/todo-create").then(function(Todo){
+        steal.import("todomvc/components/todo-create/todo-create").then(moduleDefault).then(function(Todo){
 
             var todos = document.querySelectorAll(".todo");
             var todosCount = todos.length;
@@ -388,7 +388,7 @@ module.exports = function(appVM){
     });
 
     QUnit.asyncTest("Edit todo names",function(){
-        steal.import("todomvc/components/todo-list/todo-list").then(function(){
+        steal.import("todomvc/components/todo-list/todo-list").then(moduleDefault).then(function(){
 
             fixture.then(function(fixture){
                 var todo = document.querySelector(".todo");
@@ -518,3 +518,11 @@ module.exports = function(appVM){
 
     });
 };
+
+function moduleDefault(module) {
+    if (module && typeof module === 'object' && module.__esModule === true) {
+        return module.default;
+    }
+
+    return module;
+}
