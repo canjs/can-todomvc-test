@@ -481,6 +481,21 @@ module.exports = function(appVM){
 
     });
 
+    QUnit.asyncTest("Clear all completed todos", function(){
+        var todos = Array.from(document.querySelectorAll(".todo .toggle"));
+        var uncompletedCount = todos.reduce(function(acc, todo){
+            return acc + todo.checked ? 0 : 1;
+        }, 0);
+
+        var clearCompleted = document.getElementById("clear-completed");
+        clearCompleted.click();
+        domDispatch.call(clearCompleted, "click");
+
+        setTimeout(function(){
+            QUnit.ok(document.querySelectorAll(".todo").length, uncompletedCount);
+        }, 20);
+    });
+
     QUnit.asyncTest("Setup routing", function(){
         // make sure the links are right
         var links = Array.from( document.querySelectorAll("#filters a") );
