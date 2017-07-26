@@ -493,6 +493,7 @@ module.exports = function(appVM){
 
         setTimeout(function(){
             QUnit.ok(document.querySelectorAll(".todo").length, uncompletedCount);
+            QUnit.start();
         }, 20);
     });
 
