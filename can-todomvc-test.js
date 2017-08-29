@@ -53,7 +53,7 @@ module.exports = function(appVM){
     });
 
     QUnit.test("setup works", function(){
-        var h1 = document.querySelector("h1");
+        var h1 = document.querySelectorAll("h1")[1];
         QUnit.equal(h1 && h1.innerHTML, "TodoMVC", "has an H1 titled TodoMVC");
     });
 
@@ -123,7 +123,7 @@ module.exports = function(appVM){
         var startItemsLeft = itemsLeft.innerHTML;
 
         var checkbox = document.querySelector(".todo .toggle");
-        if(document.querySelector(".toggle").hasAttribute("{($checked)}")) {
+        if(document.querySelector(".toggle").hasAttribute("checked:bind")) {
             QUnit.ok(true, "skipping tests because you are using two way bindings");
         } else {
             domDispatch.call(checkbox,"click");
@@ -142,7 +142,7 @@ module.exports = function(appVM){
         var startItemsLeft = itemsLeft.innerHTML;
 
         var checkbox = document.querySelector(".todo .toggle");
-        if(document.querySelector(".toggle").hasAttribute("{($checked)}")) {
+        if(document.querySelector(".toggle").hasAttribute("checked:bind")) {
             checkbox.checked = !checkbox.checked;
             domDispatch.call(checkbox,"change");
             var afterClickItemsLeft = itemsLeft.innerHTML;
@@ -290,7 +290,7 @@ module.exports = function(appVM){
     });
 
     QUnit.asyncTest("Toggling a todo's checkbox updates service layer",function(){
-        if(!document.querySelector(".toggle").hasAttribute("{($checked)}")) {
+        if(!document.querySelector(".toggle").hasAttribute("checked:bind")) {
             QUnit.ok(false, "not trying two-way DOM data bindings yet");
             QUnit.start();
             return;
