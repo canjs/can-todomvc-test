@@ -53,8 +53,15 @@ module.exports = function(appVM){
     });
 
     QUnit.test("setup works", function(){
-        var h1 = document.querySelectorAll("h1")[1];
-        QUnit.equal(h1 && h1.innerHTML, "TodoMVC", "has an H1 titled TodoMVC");
+        var h1s = document.querySelectorAll("h1");
+
+        for(var i = 0 ; i < h1s.length; i++) {
+            if(h1s[i].innerHTML === "TodoMVC") {
+                QUnit.ok(true, "There is an H1 titled TodoMVC");
+                return;
+            }
+        }
+        QUnit.ok(false,"There is an H1 titled TodoMVC");
     });
 
     QUnit.asyncTest("Defined Todo", function(){
