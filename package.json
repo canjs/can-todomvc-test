@@ -14,6 +14,7 @@
   "license": "MIT",
   "dependencies": {
     "can-ajax": "^1.1.4",
+    "can-symbol": "^1.4.2",
     "can-util": "^3.3.2",
     "steal-css": "^1.2.1",
     "steal-qunit": "^1.0.1"
