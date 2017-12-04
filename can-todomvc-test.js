@@ -2,7 +2,8 @@ var QUnit = require("steal-qunit");
 QUnit.config.reorder = false;
 require("./todomvc.css");
 var domDispatch = require("can-util/dom/dispatch/");
-var ajax = require("can-ajax");
+var ajax = require("can-util/dom/ajax/");
+var canSymbol = require("can-symbol");
 
 function waitFor(test){
     return new Promise(function(resolve){
@@ -110,7 +111,9 @@ module.exports = function(appVM){
         var editingTodo = document.querySelector(".todo editing");
         QUnit.ok(!editingTodo, "there's nothing being edited");
         QUnit.ok( appVM.todosList, "there's a todoList");
-        QUnit.ok( appVM.todosList.__bindEvents.active, "<strong>X</strong> items left");
+
+        var bound = appVM.todosList[canSymbol.for("can.meta")].handlers;
+        QUnit.ok(bound.root.active, "<strong>X</strong> items left");
 
         var clearCompleted = document.querySelector("#clear-completed");
 
@@ -426,6 +429,7 @@ module.exports = function(appVM){
                 QUnit.ok( document.activeElement, todoInput, "element has focus");
 
                 todoInput.blur();
+                domDispatch.call(todoInput, "blur");
                 setTimeout(function(){
                     QUnit.ok(! todo.classList.contains("editing"), ".blur() removes editing mode");
 
