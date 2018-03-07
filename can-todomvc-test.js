@@ -2,7 +2,7 @@ var QUnit = require("steal-qunit");
 QUnit.config.reorder = false;
 require("./todomvc.css");
 var domDispatch = require("can-util/dom/dispatch/");
-var ajax = require("can-util/dom/ajax/");
+var ajax = require("can-ajax");
 var canSymbol = require("can-symbol");
 
 function waitFor(test){
