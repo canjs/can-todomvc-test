@@ -1,9 +1,9 @@
-var QUnit = require("steal-qunit");
+import QUnit from "steal-qunit";
+import "./todomvc.css";
+import {domEvents, ajax} from "can";
+
 QUnit.config.reorder = false;
-require("./todomvc.css");
-var domDispatch = require("can-util/dom/dispatch/");
-var ajax = require("can-ajax");
-var canSymbol = require("can-symbol");
+
 
 function waitFor(test){
     return new Promise(function(resolve){
@@ -21,7 +21,7 @@ function waitFor(test){
     });
 }
 
-module.exports = function(appVM){
+export default function(appVM){
 
     var timeToShowTodos,
         fixture = steal.import("can-fixture"),
@@ -112,7 +112,7 @@ module.exports = function(appVM){
         QUnit.ok(!editingTodo, "there's nothing being edited");
         QUnit.ok( appVM.todosList, "there's a todoList");
 
-        var bound = appVM.todosList[canSymbol.for("can.meta")].handlers;
+        var bound = appVM.todosList[Symbol.for("can.meta")].handlers;
         QUnit.ok(bound.root.active, "<strong>X</strong> items left");
 
         var clearCompleted = document.querySelector("#clear-completed");
@@ -136,12 +136,12 @@ module.exports = function(appVM){
         if(document.querySelector(".toggle").hasAttribute("checked:bind")) {
             QUnit.ok(true, "skipping tests because you are using two way bindings");
         } else {
-            domDispatch.call(checkbox,"click");
+            domEvents.dispatch(checkbox,"click");
             var afterClickItemsLeft = itemsLeft.innerHTML;
             QUnit.ok(startItemsLeft !== afterClickItemsLeft, "X items left changes");
 
             // change it back
-            domDispatch.call(checkbox,"click");
+            domEvents.dispatch(checkbox,"click");
             afterClickItemsLeft = itemsLeft.innerHTML;
             QUnit.ok(startItemsLeft === afterClickItemsLeft, "X items left changes back");
         }
@@ -154,13 +154,13 @@ module.exports = function(appVM){
         var checkbox = document.querySelector(".todo .toggle");
         if(document.querySelector(".toggle").hasAttribute("checked:bind")) {
             checkbox.checked = !checkbox.checked;
-            domDispatch.call(checkbox,"change");
+            domEvents.dispatch(checkbox,"change");
             var afterClickItemsLeft = itemsLeft.innerHTML;
             QUnit.ok(startItemsLeft !== afterClickItemsLeft, "X items left changes");
 
             // change it back
             checkbox.checked = !checkbox.checked;
-            domDispatch.call(checkbox,"change");
+            domEvents.dispatch(checkbox,"change");
             afterClickItemsLeft = itemsLeft.innerHTML;
             QUnit.ok(startItemsLeft === afterClickItemsLeft, "X items left changes back");
         } else {
@@ -168,24 +168,9 @@ module.exports = function(appVM){
         }
     });
 
-    QUnit.asyncTest("Defining Todo.algebra",function(){
+    QUnit.asyncTest("Defining Todo identity",function(){
         todoModelPromise.then(function(Todo){
-            QUnit.ok(Todo.algebra, "Defined a Todo.algebra property");
-
-            QUnit.deepEqual( Todo.algebra.difference({}, {complete: true}), {complete: false}, ".difference with complete works" );
-            QUnit.deepEqual( Todo.algebra.clauses.id, {id: "id"}, "id specified correctly" );
-
-            var sorted = Todo.algebra.getSubset({sort: "name"}, {}, [
-                { name: "mow lawn", complete: false, id: 5 },
-                { name: "dishes", complete: true, id: 6 },
-                { name: "learn canjs", complete: false, id: 7 }
-            ]);
-            QUnit.deepEqual(sorted, [
-                { name: "dishes", complete: true, id: 6 },
-                { name: "learn canjs", complete: false, id: 7 },
-                { name: "mow lawn", complete: false, id: 5 }
-            ], "sort specified correctly");
-
+			QUnit.deepEqual(Todo[Symbol.for("can.getSchema")]().identity, ["id"], "identity is set"  );
             QUnit.start();
         }, function(){
             QUnit.ok(false, "you haven't defined models/todo yet");
@@ -313,7 +298,7 @@ module.exports = function(appVM){
 
             var toggleCheckbox = function(){
                 fixtureCompleteValue = checkbox.checked = !checkbox.checked;
-                domDispatch.call(checkbox,"change");
+                domEvents.dispatch(checkbox,"change");
                 QUnit.ok(checkbox.disabled, "checkbox is disabled while saving");
             };
             // trap this request
@@ -357,7 +342,7 @@ module.exports = function(appVM){
         var todosCount = todos.length;
         var last = todos[0];
 
-        domDispatch.call(last.querySelector(".destroy"),"click");
+        domEvents.dispatch(last.querySelector(".destroy"),"click");
         QUnit.ok(last.classList.contains("destroying"), "when instance is being destroyed, it should have `destroying` in .className");
 
         waitFor(function(){
@@ -379,7 +364,7 @@ module.exports = function(appVM){
             var newTodo = document.getElementById("new-todo");
 
             newTodo.value = "mow lawn";
-            domDispatch.call(newTodo,"change");
+            domEvents.dispatch(newTodo,"change");
 
             var event = new KeyboardEvent("keyup",{key: "Enter"});
             newTodo.dispatchEvent(event);
@@ -424,19 +409,19 @@ module.exports = function(appVM){
                 });
 
                 // try editing
-                domDispatch.call(todoLabel,"dblclick");
+                domEvents.dispatch(todoLabel,"dblclick");
                 QUnit.ok( todo.classList.contains("editing"), "in edit mode");
                 QUnit.ok( document.activeElement, todoInput, "element has focus");
 
                 todoInput.blur();
-                domDispatch.call(todoInput, "blur");
+                domEvents.dispatch(todoInput, "blur");
                 setTimeout(function(){
                     QUnit.ok(! todo.classList.contains("editing"), ".blur() removes editing mode");
 
                     // actually edit
-                    domDispatch.call(todoLabel,"dblclick");
+                    domEvents.dispatch(todoLabel,"dblclick");
                     todoInput.value = "MOW GRASS";
-                    domDispatch.call(todoInput,"change");
+                    domEvents.dispatch(todoInput,"change");
                     todoInput.dispatchEvent(new KeyboardEvent("keyup",{key: "Enter"}));
                 },20);
 
@@ -461,7 +446,7 @@ module.exports = function(appVM){
         todos.forEach(function(todo){
             var input = todo.querySelector(".toggle");
             input.checked = true;
-            domDispatch.call(input,"change");
+            domEvents.dispatch(input,"change");
         });
 
         var toggleAll = document.querySelector("#toggle-all");
@@ -469,13 +454,13 @@ module.exports = function(appVM){
 
         var input = todos[0].querySelector(".toggle");
         input.checked = false;
-        domDispatch.call(input,"change");
+        domEvents.dispatch(input,"change");
 
         QUnit.ok( !toggleAll.checked, "#toggle-all is checked when a single todo is unchecked");
 
 
         toggleAll.checked = true;
-        domDispatch.call(toggleAll,"change");
+        domEvents.dispatch(toggleAll,"change");
         QUnit.ok(toggleAll.disabled, "disabled on change");
         waitFor(function(){
             return !toggleAll.disabled;
@@ -484,7 +469,7 @@ module.exports = function(appVM){
             todos.forEach(function(todo, i){
                 var input = todo.querySelector(".toggle");
                 input.checked = initialState[i];
-                domDispatch.call(input,"change");
+                domEvents.dispatch(input,"change");
             });
 
             QUnit.start();
@@ -500,7 +485,7 @@ module.exports = function(appVM){
 
         var clearCompleted = document.getElementById("clear-completed");
         clearCompleted.click();
-        domDispatch.call(clearCompleted, "click");
+        domEvents.dispatch(clearCompleted, "click");
 
         setTimeout(function(){
             QUnit.ok(document.querySelectorAll(".todo").length, uncompletedCount);
@@ -544,7 +529,7 @@ module.exports = function(appVM){
 
 
     });
-};
+}
 
 function moduleDefault(module) {
     if (module && typeof module === 'object' && module.__esModule === true) {
