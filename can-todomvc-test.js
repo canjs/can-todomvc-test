@@ -314,6 +314,7 @@ export default function(appVM){
                     setTimeout(function(){
                         fixture.fixtures.splice(0);
                         fixture.fixtures.push.apply(fixture.fixtures, fixtures);
+						checkbox = document.querySelector(".todo .toggle"); // TODO: remove after can-connect#436
                         QUnit.ok(! checkbox.disabled, "checkbox is not disabled");
                         QUnit.start();
                     },20);
@@ -465,7 +466,7 @@ export default function(appVM){
         waitFor(function(){
             return !toggleAll.disabled;
         }).then(function(){
-
+			todos = Array.from( document.querySelectorAll(".todo") ); // TODO: remove when can-connect is fixed
             todos.forEach(function(todo, i){
                 var input = todo.querySelector(".toggle");
                 input.checked = initialState[i];
@@ -484,7 +485,7 @@ export default function(appVM){
         }, 0);
 
         var clearCompleted = document.getElementById("clear-completed");
-        clearCompleted.click();
+        //clearCompleted.click();
         domEvents.dispatch(clearCompleted, "click");
 
         setTimeout(function(){
