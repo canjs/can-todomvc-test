@@ -480,8 +480,9 @@ export default function(appVM){
 
     QUnit.asyncTest("Clear all completed todos", function(){
         var todos = Array.from(document.querySelectorAll(".todo .toggle"));
+
         var uncompletedCount = todos.reduce(function(acc, todo){
-            return acc + todo.checked ? 0 : 1;
+            return acc + (todo.checked ? 0 : 1);
         }, 0);
 
         var clearCompleted = document.getElementById("clear-completed");
@@ -489,7 +490,7 @@ export default function(appVM){
         domEvents.dispatch(clearCompleted, "click");
 
         setTimeout(function(){
-            QUnit.ok(document.querySelectorAll(".todo").length, uncompletedCount);
+            QUnit.equal(document.querySelectorAll(".todo").length, uncompletedCount, "only uncompleted todos left");
             QUnit.start();
         }, 20);
     });
