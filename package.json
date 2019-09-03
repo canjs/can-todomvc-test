@@ -1,6 +1,6 @@
 {
   "name": "can-todomvc-test",
-  "version": "5.0.1",
+  "version": "6.0.0",
   "description": "Tests and assets for the todomvc-steal guide",
   "main": "can-todomvc-test.js",
   "scripts": {
