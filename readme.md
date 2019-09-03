@@ -12,15 +12,14 @@ To use it:
 2. Import it and pass it your application main element:
 
   ```js
-  class AppVM extends ObservableObject {
+  class TodoMVC extends StacheElement {
+    static view = "";
     static props = { ... };
   }
+  customElement.define("todo-mvc", TodoMVC);
 
-  const appVM = new AppVM();
-
-  const frag = view(appVM);
-  document.body.appendChild(frag);
+  ...
   
   const todoMvcTest = require("can-todomvc-test");
-  todoMvcTest(appVM)
+  todoMvcTest(document.querySelector("todo-mvc"));
   ```
