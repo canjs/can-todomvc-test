@@ -16,7 +16,7 @@ To use it:
     static view = "";
     static props = { ... };
   }
-  customElement.define("todo-mvc", TodoMVC);
+  customElements.define("todo-mvc", TodoMVC);
 
   ...
   
