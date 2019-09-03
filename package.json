@@ -13,9 +13,9 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "can": "5.X",
+    "can": "^6.0.0-pre.8",
     "steal-css": "^1.2.1",
-    "steal-qunit": "^1.0.1"
+    "steal-qunit": "^2.0.0"
   },
   "steal": {
     "plugins": [
