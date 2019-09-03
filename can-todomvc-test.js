@@ -252,7 +252,6 @@ export default function(appVM) {
 				}
 			)
 			.catch(function(err) {
-				console.log(err.message);
 				assert.ok(false, "Todo's identity has not been defined");
 				done();
 			});
