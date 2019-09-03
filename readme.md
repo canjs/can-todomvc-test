@@ -9,17 +9,18 @@ To use it:
   npm install can-todomvc-test --save-dev
   ```
 
-2. Import it and pass it your application view model instance:
+2. Import it and pass it your application main element:
 
   ```js
-  var AppViewModel = DefineMap.extend( .... );
+  class AppVM extends ObservableObject {
+    static props = { ... };
+  }
 
+  const appVM = new AppVM();
 
-  var appVM = new AppViewModel(...);
-
-  var frag = view(appVM);
+  const frag = view(appVM);
   document.body.appendChild(frag);
   
-  var todoMvcTest = require("can-todomvc-test");
+  const todoMvcTest = require("can-todomvc-test");
   todoMvcTest(appVM)
   ```
