@@ -31,7 +31,11 @@ function moduleDefault(module) {
 export default function(appVM) {
 	var timeToShowTodos,
 		fixture = steal.import("can-fixture"),
-		todoModelPromise = steal.import("todomvc/models/todo").then(moduleDefault);
+		todoModelPromise = steal
+			.import("todomvc/models/todo")
+			.then(function(module) {
+				return { Todo: module.default, TodoList: module.TodoList };
+			});
 
 	// makes sure we wait for the app to load
 	// and sets the fixture delay to 10 on the first test.
@@ -77,7 +81,7 @@ export default function(appVM) {
 
 		todoModelPromise
 			.then(
-				function(Todo) {
+				function({ Todo }) {
 					assert.ok(true, "created module");
 					assert.equal(typeof Todo, "function", "exporting function");
 
@@ -101,17 +105,16 @@ export default function(appVM) {
 			});
 	});
 
-	QUnit.test("Defined Todo.List", function(assert) {
+	QUnit.test("Defined TodoList", function(assert) {
 		const done = assert.async();
 
 		todoModelPromise
 			.then(
-				function(Todo) {
-					assert.ok(Todo, "created module");
-					assert.equal(typeof Todo, "function", "exporting function");
+				function({ Todo, TodoList }) {
+					assert.ok(TodoList, "created module");
+					assert.equal(typeof TodoList, "function", "exporting function");
 
-					assert.ok(Todo.List, "Defined a List");
-					var todos = new Todo.List([
+					const todos = new TodoList([
 						{ complete: true },
 						{},
 						{ complete: true }
@@ -238,7 +241,7 @@ export default function(appVM) {
 
 		todoModelPromise
 			.then(
-				function(Todo) {
+				function({ Todo }) {
 					assert.deepEqual(
 						Todo[Symbol.for("can.getSchema")]().identity,
 						["id"],
@@ -262,16 +265,9 @@ export default function(appVM) {
 
 		steal
 			.import("todomvc/models/todos-fixture")
-			.then(moduleDefault)
-			.then(
-				function() {
-					return fixture;
-				},
-				function() {
-					assert.ok(false, "you haven't defined models/todos-fixture yet");
-					done();
-				}
-			)
+			.then(moduleDefault, function() {
+				throw new Error("you haven't defined models/todos-fixture yet");
+			})
 			.then(function(fixture) {
 				fixture.delay = 10;
 
@@ -330,31 +326,35 @@ export default function(appVM) {
 			.then(function() {
 				assert.ok(true, "delete is successful");
 				done();
+			})
+			.catch(function(err) {
+				assert.notOk(err, err.message);
+				done();
 			});
 	});
 
 	QUnit.test("Connecting Todo to the `/api/todos` service", function(assert) {
-		var done = assert.async();
+		const done = assert.async();
 		let Todo = null;
+		let TodoList = null;
 
 		todoModelPromise
 			.then(
-				function(result) {
-					Todo = result;
+				function({ Todo: _Todo, TodoList: _TodoList }) {
+					Todo = _Todo;
+					TodoList = _TodoList;
 					if (Todo.connection) {
 						return Todo.getList({});
 					} else {
-						assert.ok(false, "there's no connection");
-						done();
+						throw new Error("there's no connection");
 					}
 				},
 				function() {
-					assert.ok(false, "you haven't defined models/todos-fixture yet");
-					done();
+					throw new Error("you haven't defined models/todos-fixture yet");
 				}
 			)
 			.then(function(todos) {
-				assert.ok(todos instanceof Todo.List, "response is Todo.List");
+				assert.ok(todos instanceof TodoList, "response is TodoList");
 				assert.ok(todos.length, "data has at least one item");
 				var firstTodo = todos[0];
 				assert.ok(
@@ -403,6 +403,13 @@ export default function(appVM) {
 			done();
 			return;
 		}
+
+		if (!document.querySelector(".toggle").hasAttribute("on:change")) {
+			assert.ok(false, "missing on:change binding");
+			done();
+			return;
+		}
+
 		var changeCount = 0;
 		fixture.then(function(fixture) {
 			var checkbox = document.querySelector(".todo .toggle");
@@ -454,6 +461,12 @@ export default function(appVM) {
 		var todos = document.querySelectorAll(".todo");
 		var todosCount = todos.length;
 		var last = todos[0];
+
+		if (!last.querySelector(".destroy").hasAttribute("on:click")) {
+			assert.ok(false, "cannot delete to-do: missing on:click binding");
+			done();
+			return;
+		}
 
 		domEvents.dispatch(last.querySelector(".destroy"), "click");
 		assert.ok(
@@ -512,20 +525,20 @@ export default function(appVM) {
 
 		steal
 			.import("todomvc/components/todo-list/todo-list")
-			.then(moduleDefault)
-			.then(
-				function() {
-					return fixture;
-				},
-				function() {
-					assert.ok(false, "you haven't defined components/todo-list/ yet");
-					done();
-				}
-			)
+			.then(moduleDefault, function() {
+				throw new Error("you haven't defined components/todo-list/ yet");
+			})
+			.then(function() {
+				return fixture;
+			})
 			.then(function(fixture) {
 				var todo = document.querySelector(".todo");
 				var todoLabel = todo.querySelector("label");
 				var todoInput = todo.querySelector(".edit");
+
+				if (!todoLabel.hasAttribute("on:dblclick")) {
+					throw new Error("cannot edit to-do: missing on:dblclick binding");
+				}
 
 				// trap this request
 				var fixtures = fixture.fixtures.splice(0);
@@ -567,6 +580,10 @@ export default function(appVM) {
 					domEvents.dispatch(todoInput, "change");
 					todoInput.dispatchEvent(new KeyboardEvent("keyup", { key: "Enter" }));
 				}, 20);
+			})
+			.catch(function(err) {
+				assert.notOk(err, err.message);
+				done();
 			});
 	});
 
